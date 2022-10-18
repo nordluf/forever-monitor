@@ -11,6 +11,8 @@ const assert = require('assert'),
   vows = require('vows'),
   fmonitor = require('../../lib');
 
+let child;
+
 vows
   .describe('forever-monitor/monitor/send')
   .addBatch({
@@ -23,13 +25,13 @@ vows
                 '..',
                 'fixtures',
                 'send-pong.js'
-              ),
-              child = new fmonitor.Monitor(script, {
-                silent: false,
-                minUptime: 2000,
-                max: 1,
-                fork: true,
-              });
+              );
+            child = new fmonitor.Monitor(script, {
+              silent: false,
+              minUptime: 2000,
+              max: 1,
+              fork: true,
+            });
 
             child.on('message', this.callback.bind(null, null));
             child.start();
@@ -38,6 +40,7 @@ vows
           'should reemit the message correctly': function(err, msg) {
             assert.isObject(msg);
             assert.deepEqual(msg, { message: { from: 'parent' }, pong: true });
+            child.stop()
           },
         },
       },
